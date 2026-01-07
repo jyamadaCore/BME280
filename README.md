@@ -63,7 +63,7 @@ Verify and flash the code on your Photon. Code output is shown in logs at dashbo
 https://dashboard.particle.io/user/logs
 
 
-## C
+## C (BeagleBone Black)
 
 Setup your BeagleBone Black according to steps provided at:
 
@@ -71,13 +71,55 @@ https://beagleboard.org/getting-started
 
 Download (or git pull) the code in Beaglebone Black.
 
-Compile the c program.
-```cpp
-$>gcc BME280.c -o BME280
+### File Structure
+
+The C implementation is organized as a modular library:
+
+- `bme280.h` - Header file with API declarations and type definitions
+- `bme280.c` - Library implementation
+- `example_main.c` - Example program demonstrating usage
+
+### Building
+
+Compile the library and example program:
+```bash
+gcc C/bme280.c C/example_main.c -o C/bme280_example
 ```
-Run the c program.
-```cpp
-$>./BME280
+
+Run the program:
+```bash
+./C/bme280_example
+```
+
+### Using as a Library
+
+Include the header in your project and link with `bme280.c`:
+
+```c
+#include "bme280.h"
+
+int main(void) {
+    bme280_ctx_t ctx;
+    bme280_data_t data;
+    
+    bme280_init(&ctx, BME280_DEFAULT_BUS, BME280_DEFAULT_ADDRESS);
+    bme280_read_calibration(&ctx);
+    bme280_configure(&ctx);
+    bme280_read_data(&ctx, &data);
+    
+    printf("Temperature: %.2f C\n", data.temperature_c);
+    
+    bme280_close(&ctx);
+    return 0;
+}
+```
+
+### Running Tests
+
+```bash
+cd C/test
+make
+./test_bme280
 ```
 
 ## Onion Omega
